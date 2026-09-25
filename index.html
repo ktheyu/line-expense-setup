@@ -71,27 +71,14 @@
   </div>
 
   <div id="resultCard">
-    <div class="result-header"><h2>設定完成</h2><p>把下面兩樣東西設定進 iPhone 捷徑，之後記帳就不用再打開 LINE 了。</p></div>
+    <div class="result-header"><h2>設定完成</h2><p>把下面這組金鑰設定進 iPhone 捷徑，之後記帳就不用再打開 LINE 了。</p></div>
     <div class="card">
       <div class="kv"><div class="lbl">你的專屬金鑰(secret_key)</div><div class="val" id="outKey"></div></div>
       <button class="copybtn" id="copyKeyBtn" type="button">複製金鑰</button>
-      <div class="kv" style="margin-top:14px;"><div class="lbl">記帳網址</div><div class="val" id="outUrl"></div></div>
-      <button class="copybtn" id="copyUrlBtn" type="button">複製網址</button>
-    </div>
-    <div class="card">
-      <h2>iPhone 捷徑設定步驟</h2>
-      <ol class="steps">
-        <li>打開「捷徑」App，新增一個捷徑，加入「取得URL的內容」這個動作</li>
-        <li>網址欄貼上剛剛複製的記帳網址，方法選 GET</li>
-        <li>網址後面自己接參數，例如 <code class="inline">?key=你的金鑰&amp;amount=100&amp;category=飲食&amp;payment=現金</code></li>
-        <li>常用參數:key(必填)、amount(必填，金額)、category(類別)、sub(細項)、payment(付款方式)、note(備註)、date(日期，格式 2026/09/25，不填預設今天)</li>
-        <li>可以用「詢問輸入」動作讓每次執行捷徑時自己輸入金額、類別，串進網址參數裡</li>
-        <li>存成捷徑後，記得加到主畫面或設定成語音喚醒，之後記帳一鍵完成</li>
-      </ol>
     </div>
     <div class="card">
       <h2>接下來</h2>
-      <p class="desc" style="margin:0;">回到 LINE 跟機器人聊天就可以查詢/管理你的資料，例如傳「明細」「本月」「查詢庫存紀錄」「預算」都可以，設定金鑰跟這個沒關係，是另外兩件事。</p>
+      <p class="desc" style="margin:0 0 12px;">先跟管理者索取「捷徑範本」，取得後把裡面的 key 換成上面這組金鑰就能用；完整步驟看 <a href="guide.html">iPhone 捷徑設定教學</a>。回到 LINE 跟機器人聊天就可以查詢/管理你的資料，建議先輸入「說明」了解使用方法，例如傳「明細」「本月」「查詢庫存紀錄」「預算」都可以查詢與紀錄。</p>
     </div>
   </div>
 
@@ -152,7 +139,6 @@ document.getElementById("submitBtn").addEventListener("click", function () {
       document.getElementById("heroCard").style.display = "none";
       document.getElementById("formCard").style.display = "none";
       document.getElementById("outKey").textContent = res.secretKey;
-      document.getElementById("outUrl").textContent = res.execUrl || API_BASE;
       document.getElementById("resultCard").style.display = "block";
       window.scrollTo(0, 0);
     })
@@ -163,7 +149,6 @@ document.getElementById("submitBtn").addEventListener("click", function () {
 });
 
 document.getElementById("copyKeyBtn").addEventListener("click", function () { copyText(document.getElementById("outKey").textContent, this); });
-document.getElementById("copyUrlBtn").addEventListener("click", function () { copyText(document.getElementById("outUrl").textContent, this); });
 </script>
 </body>
 </html>
