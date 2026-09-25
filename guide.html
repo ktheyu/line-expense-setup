@@ -22,6 +22,12 @@
   ol.steps li { margin-bottom:4px; }
   code.inline { background:#F3F1EC; padding:1px 5px; border-radius:4px; font-size:12px; }
   .back { display:inline-block; margin-bottom:14px; color:#334155; font-size:13px; text-decoration:none; }
+  input { width:100%; padding:11px 12px; border:1px solid #D9D9D9; border-radius:9px; font-size:15px; background:#FAFAFA; }
+  input:focus { outline:none; border-color:#64748B; background:#fff; }
+  button.lookup { width:100%; margin-top:10px; padding:12px; border:none; border-radius:9px; background:#4B5563; color:#fff; font-size:14px; font-weight:600; }
+  button.lookup:disabled { background:#9CA3AF; }
+  .err { display:none; margin-top:10px; padding:11px 13px; background:#FEF2F2; border:1px solid #FCA5A5; color:#B91C1C; border-radius:9px; font-size:13px; line-height:1.6; }
+  .lookupResult { display:none; margin-top:12px; }
 </style>
 </head>
 <body>
@@ -29,40 +35,83 @@
 
   <div class="hero">
     <h1>iPhone 捷徑設定教學</h1>
-    <p>把記帳網址跟你的專屬金鑰設定進 iPhone 捷徑，之後記帳就不用再打開 LINE 了。這頁隨時可以回來看，不用重新註冊。</p>
+    <p>把記帳網址跟你的專屬金鑰設定進 iPhone 捷徑，之後記帳就不用再打開 LINE 了。這頁隨時可以回來看。</p>
   </div>
 
   <div class="card">
-    <div class="kv"><div class="lbl">記帳網址(所有人共用，結尾是 /exec)</div><div class="val" id="outUrl">https://script.google.com/macros/s/AKfycbwnKvL98Xg_tWnYqNRUJtIf4WgvlOG2ZsH2rNULzkeWC_ekJuR5dwq2WAAQ5ZOcgiYPIQ/exec</div></div>
-    <button class="copybtn" id="copyUrlBtn" type="button">複製網址</button>
-    <p class="desc" style="margin-top:12px;">你的**專屬金鑰**是設定帳號成功那時候頁面上顯示的那組(每個人不一樣)。如果找不到了，請直接私訊管理者，不要重新註冊一個新帳號。</p>
+    <p class="desc" style="margin:0;"><strong>專屬金鑰</strong>是設定帳號成功那時候頁面上顯示的那組(每個人不一樣)。</p>
+
+    <label style="display:block; font-size:13px; font-weight:600; color:#4B5563; margin:14px 0 6px;">忘記金鑰？用 LINE userId 查詢</label>
+    <input id="lookupLineUserId" type="text" placeholder="貼上你的 LINE userId" autocomplete="off" autocapitalize="off" autocorrect="off">
+    <button id="lookupBtn" class="lookup" type="button">查詢我的金鑰</button>
+    <div id="lookupErr" class="err"></div>
+    <div id="lookupResult" class="lookupResult">
+      <div class="kv" style="margin-top:12px;"><div class="lbl">暱稱</div><div class="val" id="lookupNickname"></div></div>
+      <div class="kv"><div class="lbl">你的專屬金鑰</div><div class="val" id="lookupKey"></div></div>
+      <button class="copybtn" id="copyKeyBtn" type="button">複製金鑰</button>
+    </div>
   </div>
 
   <div class="card">
     <h2>設定步驟</h2>
     <ol class="steps">
-      <li>打開「捷徑」App，新增一個捷徑，加入「取得URL的內容」這個動作</li>
-      <li>網址欄貼上上面複製的記帳網址，方法選 GET</li>
-      <li>網址後面自己接參數，例如 <code class="inline">?key=你的金鑰&amp;amount=100&amp;category=飲食&amp;payment=現金</code></li>
-      <li>常用參數:key(必填)、amount(必填，金額)、category(類別)、sub(細項)、payment(付款方式)、note(備註)、date(日期，格式 2026/09/25，不填預設今天)</li>
-      <li>可以用「詢問輸入」動作讓每次執行捷徑時自己輸入金額、類別，串進網址參數裡</li>
-      <li>存成捷徑後，記得加到主畫面或設定成語音喚醒，之後記帳一鍵完成</li>
+      <li>先跟管理者索取已經做好的「捷徑範本」分享連結，點開後選「取得捷徑」，加進自己手機</li>
+      <li>打開這個範本捷徑，找到最後一個「取得URL的內容」動作，按下內容後，把 <code class="inline">key=</code> 後面的文字貼上你自己的專屬金鑰，其他部分不用動</li>
+      <li>捷徑完成後，記得加到主畫面或設定於控制中心，之後記帳一鍵完成</li>
     </ol>
+    <p class="desc" style="margin-top:12px;">類別、細項都不是固定選項，記帳時想打什麼名稱都可以，系統會直接照你打的存起來。</p>
   </div>
 
   <div class="card">
     <h2>接下來</h2>
-    <p class="desc" style="margin:0;">回到 LINE 跟機器人聊天就可以查詢/管理你的資料，例如傳「明細」「本月」「查詢庫存紀錄」「預算」都可以，設定金鑰跟這個沒關係，是另外兩件事。</p>
+    <p class="desc" style="margin:0;">回到 LINE 跟機器人聊天就可以查詢/管理你的資料，建議輸入「說明」了解使用方法後，可回傳例如「明細」「本月」「查詢庫存紀錄」「預算」都可以查詢與紀錄。</p>
   </div>
 
 </div>
 <script>
+// 這裡要換成你自己 Apps Script 的部署網址(跟捷徑記帳、設定頁用的是同一個，結尾是 /exec)
+var API_BASE = "https://script.google.com/macros/s/AKfycbwnKvL98Xg_tWnYqNRUJtIf4WgvlOG2ZsH2rNULzkeWC_ekJuR5dwq2WAAQ5ZOcgiYPIQ/exec";
+
 function copyText(t, btn) {
   var done = function () { var old = btn.textContent; btn.textContent = "已複製"; setTimeout(function () { btn.textContent = old; }, 1500); };
   if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t).then(done); }
   else { var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); done(); }
 }
-document.getElementById("copyUrlBtn").addEventListener("click", function () { copyText(document.getElementById("outUrl").textContent, this); });
+
+document.getElementById("lookupBtn").addEventListener("click", function () {
+  var errBox = document.getElementById("lookupErr");
+  var resultBox = document.getElementById("lookupResult");
+  errBox.style.display = "none";
+  resultBox.style.display = "none";
+
+  var lineUserId = document.getElementById("lookupLineUserId").value.trim();
+  if (!lineUserId) { errBox.textContent = "請先貼上你的 LINE userId"; errBox.style.display = "block"; return; }
+
+  var btn = this;
+  btn.disabled = true; btn.textContent = "查詢中...";
+
+  var qs = new URLSearchParams({ action: "lookup", lineUserId: lineUserId });
+  fetch(API_BASE + "?" + qs.toString())
+    .then(function (res) { return res.json(); })
+    .then(function (res) {
+      btn.disabled = false; btn.textContent = "查詢我的金鑰";
+      if (!res || !res.ok) {
+        errBox.textContent = (res && res.error) || "查詢失敗，請稍後再試";
+        errBox.style.display = "block";
+        return;
+      }
+      document.getElementById("lookupNickname").textContent = res.nickname;
+      document.getElementById("lookupKey").textContent = res.secretKey;
+      resultBox.style.display = "block";
+    })
+    .catch(function (err) {
+      btn.disabled = false; btn.textContent = "查詢我的金鑰";
+      errBox.textContent = "連線失敗，請確認網路連線後再試一次(" + (err && err.message ? err.message : err) + ")";
+      errBox.style.display = "block";
+    });
+});
+
+document.getElementById("copyKeyBtn").addEventListener("click", function () { copyText(document.getElementById("lookupKey").textContent, this); });
 </script>
 </body>
 </html>
