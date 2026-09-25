@@ -44,12 +44,13 @@
 
   <div id="heroCard" class="hero">
     <h1>記帳空間 · 新朋友設定</h1>
-    <p>填一次資料，自動幫你在系統裡開一個屬於你自己的帳號(彼此的資料完全分開)，設定完會拿到你的專屬金鑰跟 iPhone 捷徑設定教學。</p>
+    <p>設定完會拿到你的專屬金鑰跟 iPhone 捷徑設定教學。</p>
+    <p style="margin-top:10px;"><a href="guide.html" style="color:#CBD5E1;">已經設定過，只是想重看捷徑教學？點這裡</a></p>
   </div>
 
   <div id="formCard" class="card">
     <h2><span class="step-badge">1</span> 取得你的 LINE ID</h2>
-    <p class="desc">先把這個記帳機器人加為 LINE 好友，在聊天視窗(不是群組)傳一則文字「我的ID」，機器人會回你一串開頭是大寫 U 的英數字，那就是你的 LINE userId。</p>
+    <p class="desc">取得「我的ID」後填寫下方 LINE userId。</p>
 
     <h2 style="margin-top:18px;"><span class="step-badge">2</span> 填寫資料</h2>
     <label for="lineUserId">LINE userId <span style="color:#DC2626;">必填</span></label>
@@ -99,7 +100,22 @@
 // 這裡要換成你自己 Apps Script 的部署網址(跟捷徑記帳用的是同一個，結尾是 /exec，不用加任何參數)
 var API_BASE = "https://script.google.com/macros/s/AKfycbwnKvL98Xg_tWnYqNRUJtIf4WgvlOG2ZsH2rNULzkeWC_ekJuR5dwq2WAAQ5ZOcgiYPIQ/exec";
 
-function showErr(msg) { var b = document.getElementById("errBox"); b.textContent = msg; b.style.display = "block"; }
+function showErr(msg) {
+  var b = document.getElementById("errBox");
+  b.textContent = msg;
+  // 如果是「已經設定過帳號」這種重複註冊的錯誤，附上捷徑教學的連結，不要讓人卡在死路
+  if (msg && msg.indexOf("已經設定過帳號") !== -1) {
+    var a = document.createElement("a");
+    a.href = "guide.html";
+    a.textContent = "點這裡查看 iPhone 捷徑設定教學";
+    a.style.display = "block";
+    a.style.marginTop = "8px";
+    a.style.color = "#B91C1C";
+    a.style.fontWeight = "600";
+    b.appendChild(a);
+  }
+  b.style.display = "block";
+}
 function hideErr() { document.getElementById("errBox").style.display = "none"; }
 function copyText(t, btn) {
   var done = function () { var old = btn.textContent; btn.textContent = "已複製"; setTimeout(function () { btn.textContent = old; }, 1500); };
