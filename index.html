@@ -45,7 +45,13 @@
   <div id="heroCard" class="hero">
     <h1>記帳空間 · 新朋友設定</h1>
     <p>設定完會拿到你的專屬金鑰跟 iPhone 捷徑設定教學。</p>
+    <p style="margin:6px 0 0; font-size:11.5px; color:#94A3B8;">這個連結 30 分鐘內有效，且只能用一次，請盡快填完。</p>
     <p style="margin-top:10px;"><a href="guide.html" style="color:#CBD5E1;">已經設定過，只是想重看捷徑教學？點這裡</a></p>
+  </div>
+
+  <div id="tokenErrCard" class="card" style="display:none;">
+    <h2>⛔ 連結無法使用</h2>
+    <p class="desc" id="tokenErrMsg" style="margin:0;"></p>
   </div>
 
   <div id="formCard" class="card">
@@ -87,6 +93,31 @@
 // 這裡要換成你自己 Apps Script 的部署網址(跟捷徑記帳用的是同一個，結尾是 /exec，不用加任何參數)
 var API_BASE = "https://script.google.com/macros/s/AKfycbwnKvL98Xg_tWnYqNRUJtIf4WgvlOG2ZsH2rNULzkeWC_ekJuR5dwq2WAAQ5ZOcgiYPIQ/exec";
 
+// 這個頁面一定要從 LINE「開始使用」跳出來的連結進來，網址上會帶一組 token，30 分鐘內有效、只能用一次
+var urlToken = new URLSearchParams(location.search).get("token") || "";
+
+function showTokenError(msg) {
+  document.getElementById("heroCard").style.display = "none";
+  document.getElementById("formCard").style.display = "none";
+  document.getElementById("tokenErrMsg").textContent = msg;
+  document.getElementById("tokenErrCard").style.display = "block";
+}
+
+if (!urlToken) {
+  showTokenError("請從 LINE 點選「開始使用」按鈕進入這個頁面，不要直接輸入網址喔。");
+} else {
+  fetch(API_BASE + "?" + new URLSearchParams({ action: "checkToken", token: urlToken }).toString())
+    .then(function (res) { return res.json(); })
+    .then(function (res) {
+      if (!res || !res.ok) {
+        showTokenError((res && res.error) || "這個連結已經失效了，請回到 LINE 重新輸入「開始使用」取得新的連結。");
+      }
+    })
+    .catch(function () {
+      // 這一步只是先幫使用者擋掉明顯失效的連結，網路問題就不擋，照樣讓他填，送出時後端還是會再驗證一次
+    });
+}
+
 function showErr(msg) {
   var b = document.getElementById("errBox");
   b.textContent = msg;
@@ -125,6 +156,7 @@ document.getElementById("submitBtn").addEventListener("click", function () {
 
   var qs = new URLSearchParams({
     action: "register",
+    token: urlToken,
     lineUserId: lineUserId,
     nickname: nickname,
     budgetItem: budgetItem,
